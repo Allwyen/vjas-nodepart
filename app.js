@@ -139,6 +139,20 @@ app.post('/vjaslogin',(req,res)=>{
   });
 });
 
+app.get('/vjasviewuser',(req,res)=>{
+    UserModel.find((error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
 app.listen(process.env.PORT || 5566,()=>{
     console.log("Server Running on PORT:5566...");
 });
