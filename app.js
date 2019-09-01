@@ -28,6 +28,7 @@ app.use(function (req, res, next) {
     next();
 });
 
+//Mongoose.connect("mongodb://localhost:27017/VJAS");
 Mongoose.connect("mongodb+srv://mongodb:mongodb@mycluster-ucvz5.mongodb.net/VJAS?retryWrites=true&w=majority");
 
 const UserModel = Mongoose.model("users",{
@@ -140,7 +141,41 @@ app.post('/vjaslogin',(req,res)=>{
 });
 
 app.get('/vjasviewuser',(req,res)=>{
-    UserModel.find((error,data)=>{
+    UserModel.find({urole:{$ne:3}},(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.post('/vjassingleuser',(req,res)=>{
+    var user = new UserModel(req.body);
+    var userfname = user.fname;
+    UserModel.find({fname:userfname},(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.post('/vjasuserstatus',(req,res)=>{
+
+    var user = new UserModel(req.body);
+    var userid = user._id;
+    var userrole = user.urole;
+    var result = UserModel.updateOne({_id:userid},{$set:{urole:userrole}},(error,data)=>{
         if(error)
         {
             throw error;
