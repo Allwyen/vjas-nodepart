@@ -79,6 +79,36 @@ app.post('/vjasregister',(req,res)=>{
 
 });
 
+app.post('/vjasforgotpwd',(req,res)=>{
+
+    var user = new UserModel(req.body);
+    var useremail = user.uemail;
+    var userpwd = user.upass;
+
+    UserModel.findOne({uemail:useremail},(error,data)=>{
+        if(!data)
+        {
+            res.json("Cannot find Email ID !!");
+        }
+        else
+        {
+            UserModel.updateOne({uemail:useremail},{$set:{upass:userpwd}},(error,data)=>{
+                if(error)
+                {
+                    throw error;
+                    res.send(error);
+                }
+                else
+                {
+                    console.log(data);
+                    res.json("Password Updated Successfully!!");
+                }
+            });
+        }
+    });
+
+});
+
 app.get('/login',(req,res)=>{
     var x = req.query.uemail;
     var y = req.query.upass;
