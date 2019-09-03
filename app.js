@@ -172,9 +172,8 @@ app.post('/vjassingleuser',(req,res)=>{
 
 app.post('/vjasuserstatus',(req,res)=>{
 
-    var user = new UserModel(req.body);
-    var userid = user._id;
-    var userrole = user.urole;
+    var userid = req.body.eid;
+    var userrole = req.body.uroleset;
     var result = UserModel.updateOne({_id:userid},{$set:{urole:userrole}},(error,data)=>{
         if(error)
         {
@@ -183,7 +182,7 @@ app.post('/vjasuserstatus',(req,res)=>{
         }
         else
         {
-            res.send(data);
+            res.json("Userrole Updated Successfully!!");
         }
     });
 });
