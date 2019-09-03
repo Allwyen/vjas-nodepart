@@ -216,7 +216,7 @@ app.post('/vjasinsertcar',(req,res)=>{
         }
         else
         {
-            res.json("Car Details Registered!!");
+            res.send(data);
         }
     });
 });
