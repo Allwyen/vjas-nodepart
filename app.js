@@ -48,6 +48,24 @@ const UserModel = Mongoose.model("users",{
     }
 });
 
+const CarModel = Mongoose.model("cars",{
+    cregno:String,
+    cmodel:String,
+    ccno:String,
+    coname:String,
+    coemail:String,
+    comobile:String,
+    cissue:[{
+        cissuename:
+        { 
+            type:Array, 
+            "default":[] 
+        },
+        cissuedate:Date,
+        staffid:{type:Mongoose.Types.ObjectId,ref:'users'}
+    }]
+});
+
 app.post('/vjasregister',(req,res)=>{
 
     var user = new UserModel(req.body);
@@ -154,22 +172,6 @@ app.get('/vjasviewuser',(req,res)=>{
     });
 });
 
-app.post('/vjassingleuser',(req,res)=>{
-    var user = new UserModel(req.body);
-    var userfname = user.fname;
-    UserModel.find({fname:userfname},(error,data)=>{
-        if(error)
-        {
-            throw error;
-            res.send(error);
-        }
-        else
-        {
-            res.send(data);
-        }
-    });
-});
-
 app.post('/vjasuserstatus',(req,res)=>{
 
     var userid = req.body.eid;
@@ -183,6 +185,38 @@ app.post('/vjasuserstatus',(req,res)=>{
         else
         {
             res.json("Userrole Updated Successfully!!");
+        }
+    });
+});
+
+app.post('/vjasviewcar',(req,res)=>{
+    var car = new CarModel(req.body);
+    console.log(req.body);
+    var regno = car.cregno;
+    CarModel.findOne({cregno:regno},(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.post('/vjasinsertcar',(req,res)=>{
+    var car = new CarModel(req.body);
+    car.save((error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.json("Car Details Registered!!");
         }
     });
 });
