@@ -209,17 +209,32 @@ app.post('/vjasviewcar',(req,res)=>{
 
 app.post('/vjasinsertcar',(req,res)=>{
     var car = new CarModel(req.body);
-    car.save((error,data)=>{
-        if(error)
+    var carregno = car.cregno;
+    var carchasssisno = car.ccno;
+    CarModel.findOne({$or:[{cregno:carregno},{ccno:carchasssisno}]},(error,data)=>{
+        if(!data)
         {
-            throw error;
-            res.send(error);
+            car.save((error,data)=>{
+                if(error)
+                {
+                    throw error;
+                    res.send(error);
+                }
+                else
+                {
+                    res.send(data);
+                    console.log(data);
+                }
+            });
         }
         else
         {
-            res.send(data);
+            var mydata = null;
+            res.send(mydata);
+            console.log(mydata);
         }
     });
+    
 });
 
 app.post('/vjasupdatecar',(req,res)=>{
