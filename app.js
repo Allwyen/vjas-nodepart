@@ -63,6 +63,7 @@ const IssueModel = Mongoose.model("issues",{
         default:[]
     },
     issuedate:Date,
+    readings:Number,
     icarid:{type:Mongoose.Types.ObjectId,ref:'cars'},
     istaffid:{type:Mongoose.Types.ObjectId,ref:'users'}
 });
