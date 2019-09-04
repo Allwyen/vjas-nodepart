@@ -55,15 +55,16 @@ const CarModel = Mongoose.model("cars",{
     coname:String,
     coemail:String,
     comobile:String,
-    cissue:[{
-        cissuename:
-        { 
-            type:Array, 
-            "default":[] 
-        },
-        cissuedate:Date,
-        staffid:{type:Mongoose.Types.ObjectId,ref:'users'}
-    }]
+});
+
+const IssueModel = Mongoose.model("issues",{
+    issuename:{
+        type:Array,
+        default:[]
+    },
+    issuedate:Date,
+    icarid:{type:Mongoose.Types.ObjectId,ref:'cars'},
+    istaffid:{type:Mongoose.Types.ObjectId,ref:'users'}
 });
 
 app.post('/vjasregister',(req,res)=>{
@@ -209,6 +210,26 @@ app.post('/vjasviewcar',(req,res)=>{
 app.post('/vjasinsertcar',(req,res)=>{
     var car = new CarModel(req.body);
     car.save((error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.post('/vjasupdatecar',(req,res)=>{
+    
+    var carid = req.body._id;
+    var ownername = req.body.coname;
+    var owneremail = req.body.coemail;
+    var ownermobile = req.body.comobile;
+
+    var result = CarModel.updateOne({_id:carid},{$set:{coname:ownername,coemail:owneremail,comobile:ownermobile}},(error,data)=>{
         if(error)
         {
             throw error;
