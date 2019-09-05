@@ -58,12 +58,10 @@ const CarModel = Mongoose.model("cars",{
 });
 
 const IssueModel = Mongoose.model("issues",{
-    issuename:{
-        type:Array,
-        default:[]
-    },
-    issuedate:Date,
-    readings:Number,
+    idate:String,
+    itime:String,
+    ireadings:Number,
+    icomments:String,
     icarid:{type:Mongoose.Types.ObjectId,ref:'cars'},
     istaffid:{type:Mongoose.Types.ObjectId,ref:'users'}
 });
@@ -246,6 +244,23 @@ app.post('/vjasupdatecar',(req,res)=>{
     var ownermobile = req.body.comobile;
 
     var result = CarModel.updateOne({_id:carid},{$set:{coname:ownername,coemail:owneremail,comobile:ownermobile}},(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.post('/vjasinsertissue',(req,res)=>{
+    var issue = new IssueModel(req.body);
+    console.log(issue);
+
+    var result = issue.save((error,data)=>{
         if(error)
         {
             throw error;
