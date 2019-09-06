@@ -72,7 +72,8 @@ const AssignModel = Mongoose.model("assigns",{
         default:null
     },
     acarid:{type:Mongoose.Types.ObjectId,ref:'cars'},
-    astaffid:{type:Mongoose.Types.ObjectId,ref:'users'}
+    astaffid:{type:Mongoose.Types.ObjectId,ref:'users'},
+    aissueid:{type:Mongoose.Types.ObjectId,ref:'issues'}
 });
 
 app.post('/vjasregister',(req,res)=>{
@@ -309,29 +310,29 @@ app.get('/vjaspendingcar',(req,res)=>{
             });
 });
 
-app.post('/vjaspendingissue',(req,res)=>{
+app.post('/vjasviewmechanictask',(req,res)=>{
     console.log(req.body);
-    CarModel.aggregate([
+    AssignModel.aggregate([
         { $lookup:
             {
                 from: "issues", // collection to join
-                localField: "_id",//field from the input documents
-                foreignField: "icarid",//field from the documents of the "from" collection
+                localField: "aissueid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
                 as: "issues"// output array field
             }
             
         },
         { $lookup:
             {
-                from: "assigns", // collection to join
-                localField: "_id",//field from the input documents
-                foreignField: "acarid",//field from the documents of the "from" collection
-                as: "assigns"// output array field
+                from: "cars", // collection to join
+                localField: "acarid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "cars"// output array field
             }
             
         },
         {
-            $match:{_id:{$eq:Mongoose.Types.ObjectId(req.body.carid)}}
+            $match:{astaffid:{$eq:Mongoose.Types.ObjectId(req.body.myuserid)}}
         }
     ],(error,data)=>{
         if(error)
@@ -377,6 +378,8 @@ app.post('/vjasviewcarassign',(req,res)=>{
 
 app.post('/vjasinsertcarassign',(req,res)=>{
     var assign = new AssignModel(req.body);
+    console.log(assign);
+    console.log(req.body);
     assign.save((error,data)=>{
         if(error)
         {
