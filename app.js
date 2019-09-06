@@ -332,7 +332,7 @@ app.post('/vjasviewmechanictask',(req,res)=>{
             
         },
         {
-            $match:{astaffid:{$eq:Mongoose.Types.ObjectId(req.body.myuserid)}}
+            $match:{astaffid:{$eq:Mongoose.Types.ObjectId(req.body.myuserid)},astatus:{$eq:0}}
         }
     ],(error,data)=>{
         if(error)
