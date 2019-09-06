@@ -54,7 +54,7 @@ const CarModel = Mongoose.model("cars",{
     ccno:String,
     coname:String,
     coemail:String,
-    comobile:String,
+    comobile:String
 });
 
 const IssueModel = Mongoose.model("issues",{
@@ -64,6 +64,15 @@ const IssueModel = Mongoose.model("issues",{
     icomments:String,
     icarid:{type:Mongoose.Types.ObjectId,ref:'cars'},
     istaffid:{type:Mongoose.Types.ObjectId,ref:'users'}
+});
+
+const AssignModel = Mongoose.model("assigns",{
+    astatus:{
+        type:Number,
+        default:null
+    },
+    acarid:{type:Mongoose.Types.ObjectId,ref:'cars'},
+    astaffid:{type:Mongoose.Types.ObjectId,ref:'users'}
 });
 
 app.post('/vjasregister',(req,res)=>{
@@ -261,6 +270,128 @@ app.post('/vjasinsertissue',(req,res)=>{
     console.log(issue);
 
     var result = issue.save((error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.get('/vjaspendingcar',(req,res)=>{
+
+            CarModel.aggregate([
+                { $lookup:
+                    {
+                        from: "assigns", // collection to join
+                        localField: "_id",//field from the input documents
+                        foreignField: "acarid",//field from the documents of the "from" collection
+                        as: "assigns"// output array field
+                    }
+                },
+                {
+                    $match:{astatus:{$eq:null}}
+                }
+            ],(error,data)=>{
+                if(error)
+                {
+                    throw error;
+                    res.send(error);
+                }
+                else
+                {
+                    res.send(data);
+                }
+            });
+});
+
+app.post('/vjaspendingissue',(req,res)=>{
+    console.log(req.body);
+    CarModel.aggregate([
+        { $lookup:
+            {
+                from: "issues", // collection to join
+                localField: "_id",//field from the input documents
+                foreignField: "icarid",//field from the documents of the "from" collection
+                as: "issues"// output array field
+            }
+            
+        },
+        { $lookup:
+            {
+                from: "assigns", // collection to join
+                localField: "_id",//field from the input documents
+                foreignField: "acarid",//field from the documents of the "from" collection
+                as: "assigns"// output array field
+            }
+            
+        },
+        {
+            $match:{_id:{$eq:Mongoose.Types.ObjectId(req.body.carid)}}
+        }
+    ],(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.get('/vjasviewmechanic',(req,res)=>{
+    UserModel.find({$and:[{urole:2},{jstatus:0}]},(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.post('/vjasviewcarassign',(req,res)=>{
+    AssignModel.find({$and:[{acarid:req.body.acarid},{astatus:0}]},(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+       
+    });
+});
+
+app.post('/vjasinsertcarassign',(req,res)=>{
+    var assign = new AssignModel(req.body);
+    assign.save((error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.post('/vjasupdatejstatus',(req,res)=>{
+    UserModel.updateOne({_id:req.body.astaffid},{$set:{jstatus:1}},(error,data)=>{
         if(error)
         {
             throw error;
