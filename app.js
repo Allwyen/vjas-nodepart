@@ -77,6 +77,8 @@ const AssignModel = Mongoose.model("assigns",{
     aissueid:{type:Mongoose.Types.ObjectId,ref:'issues'}
 });
 
+var parray = [];
+
 app.post('/vjasregister',(req,res)=>{
 
     var user = new UserModel(req.body);
@@ -286,17 +288,25 @@ app.post('/vjasinsertissue',(req,res)=>{
 
 app.get('/vjaspendingcar',(req,res)=>{
 
-            CarModel.aggregate([
+            IssueModel.aggregate([
                 { $lookup:
                     {
                         from: "assigns", // collection to join
                         localField: "_id",//field from the input documents
-                        foreignField: "acarid",//field from the documents of the "from" collection
+                        foreignField: "aissueid",//field from the documents of the "from" collection
                         as: "assigns"// output array field
                     }
                 },
+                { $lookup:
+                    {
+                        from: "cars", // collection to join
+                        localField: "icarid",//field from the input documents
+                        foreignField: "_id",//field from the documents of the "from" collection
+                        as: "cars"// output array field
+                    }
+                },
                 {
-                    $match:{astatus:{$eq:null}}
+                    $match:{assigns:[]}
                 }
             ],(error,data)=>{
                 if(error)
