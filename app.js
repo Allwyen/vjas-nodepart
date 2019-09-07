@@ -71,6 +71,7 @@ const AssignModel = Mongoose.model("assigns",{
         type:Number,
         default:null
     },
+    cdate:String,
     acarid:{type:Mongoose.Types.ObjectId,ref:'cars'},
     astaffid:{type:Mongoose.Types.ObjectId,ref:'users'},
     aissueid:{type:Mongoose.Types.ObjectId,ref:'issues'}
@@ -332,7 +333,7 @@ app.post('/vjasviewmechanictask',(req,res)=>{
             
         },
         {
-            $match:{astaffid:{$eq:Mongoose.Types.ObjectId(req.body.myuserid)},astatus:{$eq:0}}
+            $match:{astaffid:{$eq:Mongoose.Types.ObjectId(req.body.myuserid)},$or:[{astatus:{$eq:0}},{astatus:{$eq:1}}]}
         }
     ],(error,data)=>{
         if(error)
@@ -395,6 +396,34 @@ app.post('/vjasinsertcarassign',(req,res)=>{
 
 app.post('/vjasupdatejstatus',(req,res)=>{
     UserModel.updateOne({_id:req.body.astaffid},{$set:{jstatus:1}},(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.post('/vjasupdateastatus',(req,res)=>{
+    AssignModel.updateOne({_id:req.body.aid},{$set:{astatus:req.body.astatus}},(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.post('/vjasrevokejstatus',(req,res)=>{
+    UserModel.updateOne({_id:req.body.astaffid},{$set:{jstatus:0}},(error,data)=>{
         if(error)
         {
             throw error;
