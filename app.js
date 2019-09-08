@@ -186,6 +186,20 @@ app.get('/vjasviewuser',(req,res)=>{
     });
 });
 
+app.post('/vjasgetuser',(req,res)=>{
+    UserModel.find({_id:{$eq:req.body.uid}},(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
 app.post('/vjasuserstatus',(req,res)=>{
 
     var userid = req.body.eid;
@@ -480,6 +494,80 @@ app.post('/vjascownersendemail', (req, res) => {
   
     callback(info);
   }
+
+app.post('/vjasmechcompletedtask',(req,res)=>{
+    AssignModel.aggregate([
+        { $lookup:
+            {
+                from: "issues", // collection to join
+                localField: "aissueid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "issues"// output array field
+            }
+            
+        },
+        { $lookup:
+            {
+                from: "cars", // collection to join
+                localField: "acarid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "cars"// output array field
+            }
+            
+        },
+        {
+            $match:{astaffid:{$eq:Mongoose.Types.ObjectId(req.body.astaffid)},astatus:{$eq:2}}
+        }
+    ],(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.post('/vjasmechcompletedtasksearch',(req,res)=>{
+    console.log(req.body.acarid);
+    AssignModel.aggregate([
+        { $lookup:
+            {
+                from: "issues", // collection to join
+                localField: "aissueid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "issues"// output array field
+            }
+            
+        },
+        { $lookup:
+            {
+                from: "cars", // collection to join
+                localField: "acarid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "cars"// output array field
+            }
+            
+        },
+        {
+            $match:{astaffid:{$eq:Mongoose.Types.ObjectId(req.body.astaffid)},astatus:{$eq:2},acarid:{$eq:Mongoose.Types.ObjectId(req.body.acarid)}}
+        }
+    ],(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
 
 app.listen(process.env.PORT || 5566,()=>{
     console.log("Server Running on PORT:5566...");
