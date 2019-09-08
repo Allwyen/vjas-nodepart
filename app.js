@@ -2,6 +2,7 @@ const Express = require('express');
 const bodyParser = require('body-parser');
 const Mongoose = require('mongoose');
 const request = require('request');
+const nodemailer = require('nodemailer');
 
 var app = new Express();
 
@@ -445,6 +446,40 @@ app.post('/vjasrevokejstatus',(req,res)=>{
         }
     });
 });
+
+app.post('/vjascownersendemail', (req, res) => {
+    let user = req.body;
+    sendMail(user, info => {
+      console.log('The mail has been send...');
+      res.send(info);
+    });
+  });
+
+  async function sendMail(user, callback) {
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: "guser7283@gmail.com",
+        pass: "Neywll@123"
+      }
+    });
+  
+    let mailOptions = {
+      from: '"VJAS-Car Service"<vjas@gmail.com>', // sender address
+      to: user.coemail, // list of receivers
+      subject: "Car Service Completed", // Subject line
+      html: `<h1>Hi ${user.coname}</h1><br>
+      <h4>Your vehicle service has been completed. Please come for pickup by 5:00pm</h4>`
+    };
+  
+    // send mail with defined transport object
+    let info = await transporter.sendMail(mailOptions);
+  
+    callback(info);
+  }
 
 app.listen(process.env.PORT || 5566,()=>{
     console.log("Server Running on PORT:5566...");
