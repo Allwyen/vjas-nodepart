@@ -568,6 +568,110 @@ app.post('/vjasmechcompletedtasksearch',(req,res)=>{
     });
 });
 
+app.get('/vjasworkstatus',(req,res)=>{
+    AssignModel.aggregate([
+        { $lookup:
+            {
+                from: "cars", // collection to join
+                localField: "acarid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "car"// output array field
+            }
+            
+        },
+        { $lookup:
+            {
+                from: "issues", // collection to join
+                localField: "aissueid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "issue"// output array field
+            }
+            
+        },
+        { $lookup:
+            {
+                from: "users", // collection to join
+                localField: "issue.istaffid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "issuestaff"// output array field
+            }
+            
+        },
+        { $lookup:
+            {
+                from: "users", // collection to join
+                localField: "astaffid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "assignstaff"// output array field
+            }
+            
+        }
+    ],(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
+
+app.post('/vjasworkstatussearch',(req,res)=>{
+    AssignModel.aggregate([
+        { $lookup:
+            {
+                from: "cars", // collection to join
+                localField: "acarid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "car"// output array field
+            }
+            
+        },
+        { $lookup:
+            {
+                from: "issues", // collection to join
+                localField: "aissueid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "issue"// output array field
+            }
+            
+        },
+        { $lookup:
+            {
+                from: "users", // collection to join
+                localField: "issue.istaffid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "issuestaff"// output array field
+            }
+            
+        },
+        { $lookup:
+            {
+                from: "users", // collection to join
+                localField: "astaffid",//field from the input documents
+                foreignField: "_id",//field from the documents of the "from" collection
+                as: "assignstaff"// output array field
+            }
+            
+        },
+        {
+            $match:{acarid:{$eq:Mongoose.Types.ObjectId(req.body.acarid)}}
+        }
+    ],(error,data)=>{
+        if(error)
+        {
+            throw error;
+            res.send(error);
+        }
+        else
+        {
+            res.send(data);
+        }
+    });
+});
 
 app.listen(process.env.PORT || 5566,()=>{
     console.log("Server Running on PORT:5566...");
